@@ -4,8 +4,23 @@ from __future__ import unicode_literals
 from django.db import models
 from django.core import exceptions
 from mathfield.api import store_math
+from mathfield.widgets import MathFieldWidget
 import json
 
+try:
+    unicode = unicode
+except NameError:
+    # 'unicode' is undefined, must be Python 3
+    str = str
+    unicode = str
+    bytes = bytes
+    basestring = (str,bytes)
+else:
+    # 'unicode' exists, must be Python 2
+    str = str
+    unicode = unicode
+    bytes = str
+    basestring = basestring
 
 MathFieldValidationError = lambda self, value: exceptions.ValidationError(
     'Could not resolve "{0}" to a dictionary with only keys "raw" and "html"'
@@ -13,9 +28,7 @@ MathFieldValidationError = lambda self, value: exceptions.ValidationError(
 
 
 class MathField(models.TextField):
-
     description = 'Field that allows you to write LaTeX and display it as HTML.'
-
     __metaclass__ = models.SubfieldBase
 
     def to_python(self, value):
@@ -42,12 +55,12 @@ class MathField(models.TextField):
                 # the value was stored as just a string. Try to compile it to
                 # LaTeX and return a dictionary, or raise a NodeError
                 return store_math(value)
-        
+
         if isinstance(value, dict):
             return value
-        
+
         return {'raw': '', 'html': ''}
-        
+
     def get_prep_value(self, value):
         if not value:
             return json.dumps({'raw': '', 'html': ''})
@@ -64,7 +77,7 @@ class MathField(models.TextField):
             else:
                 if {'raw', 'html'} == set(dictval.keys()):
                     return value
-                else:                
+                else:
                     raise MathFieldValidationError(self, value)
 
         if isinstance(value, dict):
@@ -77,8 +90,9 @@ class MathField(models.TextField):
 
     def formfield(self, **kwargs):
         defaults = {
-            'help_text': ('Type text as you would normally, or write LaTeX ' 
-                'by surrounding it with $ characters.')
+            'help_text': ('Type text as you would normally, or write LaTeX '
+                'by surrounding it with $ characters.'),
+            'widget': MathFieldWidget
         }
         defaults.update(kwargs)
         field = super(MathField, self).formfield(**defaults)

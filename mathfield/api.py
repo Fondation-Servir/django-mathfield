@@ -4,7 +4,12 @@ import subprocess
 import os
 import re
 import cgi
-from django.utils.encoding import smart_unicode
+
+import sys
+if sys.version_info[0] == 3:
+    from django.utils.encoding import smart_text as smart_unicode
+else:
+    from django.utils.encoding import smart_unicode
 
 # These are functions for developers to use externally
 
