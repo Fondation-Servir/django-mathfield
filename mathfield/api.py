@@ -40,7 +40,7 @@ def store_math(raw='', html=''):
     if raw == '' or html != '':
         return {'raw': raw, 'html': html}
 
-    return {'raw': raw, 'html': render_to_html(raw)}
+    return {'raw': raw, 'html': render_to_html(raw).replace('\n', '<br />').replace("\n", "<br />")}
 
 
 def render_to_html(raw):
@@ -91,7 +91,7 @@ def render_to_html(raw):
     if node_error:
         raise NodeError(node_error)
 
-    html_bits = node_output.strip('\n').split('\n')
+    html_bits = node_output.decode('utf-8').strip('\n').split('\n')
 
     final = []
     loc = 0

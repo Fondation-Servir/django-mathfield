@@ -42,6 +42,8 @@ class MathFieldWidget(forms.Textarea):
             	raw = value['raw'] if 'raw' in value else ''
             	html = value['html'] if 'html' in value else ''
             	html = html.replace('"', '\\"').replace("'", "\\'")
+            	raw = raw.replace('\n', '\\n').replace("\n", "\\n")
+            	html = html.replace('\n', '<br />').replace("\n", "<br />")
             elif isinstance(value, basestring):
             	raw = value
             	html = ''
